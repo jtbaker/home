@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ingress-nginx-fetch-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: fetch-nginx-yaml
+          image: bitnami/kubectl:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              curl -s https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml -o /tmp/deploy.yaml &&
+              kubectl apply -f /tmp/deploy.yaml
+      restartPolicy: OnFailure

@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  namespace: home
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      volumes:
+        - name: pihole-config
+          emptyDir: {}
+        - name: dnsmasq-config
+          emptyDir: {}
+        - name: pihole-env
+          configMap:
+            name: pihole-env
+      containers:
+      - name: pihole
+        image: pihole/pihole:latest
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+          - name: pihole-config
+            mountPath: /etc/pihole
+          - name: dnsmasq-config
+            mountPath: /etc/dnsmasq.d
+          - name: pihole-env
+            mountPath: /etc/pihole/custom.list
+            subPath: custom.list
+        envFrom:
+          - configMapRef:
+              name: pihole-env
+        env:
+          - name: WEBPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pihole-secret
+                key: password
+        ports:
+
+          - name: dns-tcp
+            containerPort: 53
+            protocol: TCP
+          - name: dns-udp
+            containerPort: 53
+            protocol: UDP
+          - name: http
+            containerPort: 80
+            protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole
+  namespace: home
+spec:
+  type: NodePort
+  selector:
+    app: pihole
+  ports:
+  - name: tcp
+    protocol: TCP
+    port: 80
+    nodePort: 30001
+  - name: dns-udp
+    protocol: UDP
+    port: 53
+    targetPort: 53
+    nodePort: 30002
+  - name: dns-tcp
+    protocol: TCP
+    port: 53
+    targetPort: 53
+    nodePort: 30002

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-env
+  namespace: home
+  
+data:
+  TZ: "America/Chicago"
+  MAXDBDAYS: "1"
+  PIHOLE_DNS_: "1.1.1.1;1.0.0.1;2606:4700:4700::1111;2606:4700:4700::1001"
+  FTLCONF_LOCAL_IPV4: "192.168.86.107"
+  LOCAL_DNS: "pi"
+  PIHOLE_EXTRA_HOSTS: "pi:192.168.86.107"
+  custom.list: |
+    192.168.86.107 pi
