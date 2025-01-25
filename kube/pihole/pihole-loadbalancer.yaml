@@ -5,6 +5,10 @@ metadata:
   namespace: home
   annotations:
     metallb.universe.tf/allow-shared-ip: "pihole-dns"
+    tailscale.com/expose: "true"
+    tailscale.com/dns-enabled: "true"
+    tailscale.com/dns-search-domains: "baker.local"
+    tailscale.com/dns-nameservers: "10.43.80.73" # Replace with Pi-hole's 
 spec:
   type: LoadBalancer
   selector:
